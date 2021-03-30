@@ -54,7 +54,7 @@ while True:
     data, addr = udp.recvfrom(PACKET_SIZE) # Receive data from UDP socket
 
     #receive header to know the package id
-    pkg_header = unpack(header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
+    pkg_header = unpack(H.header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
 
     '''
     if pkg_header[4] == 6:
@@ -68,5 +68,5 @@ while True:
     '''
 
     if pkg_header[4] == 0 or  pkg_header[4] == 6 or pkg_header[4] == 7:
-        ar = np.array(unpack(package_6,data)[10:]) #remove first 10 entries, aka the header
+        ar = np.array(unpack(H.packages[pkg_header[4]],data)[10:]) #remove first 10 entries, aka the header
         print(ar)
