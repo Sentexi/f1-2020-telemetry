@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # coding=utf-8
-
 #
 # F1 Telemetry - Main application
 # Written in Python by Sentexi
@@ -12,8 +11,6 @@
 # -- https://docs.microsoft.com/de-de/cpp/cpp/data-type-ranges?view=msvc-160
 # -- https://forums.codemasters.com/topic/50942-f1-2020-udp-specification/
 #
-# This work is licensed under a "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License"
-# License URL: https://creativecommons.org/licenses/by-nc-nd/4.0/
 #
 
 import socket, math, sys # Import libraries
@@ -67,7 +64,7 @@ while True:
              "Tyres: FL: {} FR: {} RL: {} RR: {}".format(re[i][13],re[i][14],re[i][15],re[i][16]),end="\n")
     '''
 
-    if pkg_header[4] == 0 or  pkg_header[4] == 6 or pkg_header[4] == 7:
+    if pkg_header[4] != 3 or  pkg_header[4] == 6 or pkg_header[4] == 7:
         print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
         ar = np.array(unpack(H.packages[pkg_header[4]],data)[10:]) #remove first 10 entries, aka the header
         print(ar)
