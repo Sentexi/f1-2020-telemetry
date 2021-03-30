@@ -19,12 +19,13 @@
 import socket, math, sys # Import libraries
 from struct import * # Import everything from struct
 import numpy as np #import numpy
+import headers as H #import predefined header structures
 
 UDP_IP = "0.0.0.0" # UDP listen IP-address (0.0.0.0 = all)
 UDP_PORT = 20777 # UDP listen port
 PACKET_SIZE = 9999 # Amount of bytes in packet
 
-
+print(H.package_6)
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Create UDP Socket
 udp.bind((UDP_IP, UDP_PORT)) # Bind socket to IP and port
@@ -47,14 +48,6 @@ float    f
 uint64    unsigned long long    Q
 
 '''
-
-header = "<HBBBBQfIBB"
-
-package_6_codec = "HfffBbHBBHHHHBBBBBBBBHffffBBBB"
-package_6 = header + package_6_codec*22 + "IBBb"
-
-print(calcsize(package_6))
-
 
 
 # Package receival loop
