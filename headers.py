@@ -102,11 +102,6 @@ dummy ="xyz"
 packages = [package_0,package_1,package_2,dummy,package_4,package_5,package_6, \
 package_7,package_8,package_9]
 
-
-
-
-print(calcsize(package_6))
-
 if __name__ == "__main__":
     print("Checking package integrity")
     

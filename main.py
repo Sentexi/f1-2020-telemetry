@@ -18,6 +18,7 @@ import socket, math, sys # Import libraries
 from struct import * # Import everything from struct
 import numpy as np #import numpy
 import headers as H #import predefined header structures
+import writefile as W #imports a simple csv file writer
 
 UDP_IP = "0.0.0.0" # UDP listen IP-address (0.0.0.0 = all)
 UDP_PORT = 20777 # UDP listen port
@@ -44,13 +45,7 @@ float    f
 uint64    unsigned long long    Q
 
 '''
-def write_csv(package_ID,data):
-    Filename = os.path.join("session",str(package_ID),"data")
 
-    with open('{}.csv'.format(Filename),'a',newline='') as file:
-        writer = csv.writer(file, delimiter=",",quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(data)
-    pass
 
 #Initialize folder structure
 if not os.path.isdir("session"):
@@ -67,20 +62,10 @@ while True:
 
     #receive header to know the package id
     pkg_header = unpack(H.header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
-
-    '''
-    if pkg_header[4] == 6:
-         #print(sys.getsizeof(data))
-         #print(unpack(package_6,data)[10:-4])
-         ar = np.array(unpack(package_6,data)[10:-4])
-         re = np.reshape(ar,(22,-1))
-         for i in range(np.shape(re)[0]):
-             print("\n" + "Car Nr. {}".format(i)  + "\n" + "Speed: {} km/h".format(re[i][0]) + "\n"  \
-             "Tyres: FL: {} FR: {} RL: {} RR: {}".format(re[i][13],re[i][14],re[i][15],re[i][16]),end="\n")
-    '''
+    pkg_header = unpack(H.header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
 
     if pkg_header[4] != 3:
-        print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
-        ar = np.array(unpack(H.packages[pkg_header[4]],data)[10:]) #remove first 10 entries, aka the header
-        write_csv(pkg_header[4],ar)
+        #print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
+        ar = np.array(unpack(H.packages[pkg_header[4]],data)) #transforms data in numpy array
+        W.write_csv(pkg_header[4],ar) #writes each package in correspondent CSV
         #print(ar)
