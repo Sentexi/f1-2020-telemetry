@@ -64,7 +64,7 @@ while True:
              "Tyres: FL: {} FR: {} RL: {} RR: {}".format(re[i][13],re[i][14],re[i][15],re[i][16]),end="\n")
     '''
 
-    if pkg_header[4] != 3 or  pkg_header[4] == 6 or pkg_header[4] == 7:
+    if pkg_header[4] != 3:
         print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
         ar = np.array(unpack(H.packages[pkg_header[4]],data)[10:]) #remove first 10 entries, aka the header
         print(ar)
