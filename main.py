@@ -46,14 +46,15 @@ uint64    unsigned long long    Q
 
 '''
 
+sessionname = "Race1" #Define session name
 
 #Initialize folder structure
-if not os.path.isdir("session"):
-    os.mkdir("session")
+if not os.path.isdir(sessionname):
+    os.mkdir(sessionname)
     
 for num in range(10):
-    if not os.path.isdir(os.path.join("session",str(num))):
-        os.mkdir(os.path.join("session",str(num)))
+    if not os.path.isdir(os.path.join(sessionname,str(num))):
+        os.mkdir(os.path.join(sessionname,str(num)))
 
 # Package receival loop
 while True:
@@ -67,5 +68,5 @@ while True:
     if pkg_header[4] != 3:
         #print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
         ar = np.array(unpack(H.packages[pkg_header[4]],data)) #transforms data in numpy array
-        W.write_csv(pkg_header[4],ar) #writes each package in correspondent CSV
+        W.write_csv(pkg_header[4],ar,sessionname) #writes each package in correspondent CSV
         #print(ar)
