@@ -12,7 +12,8 @@
 # -- https://forums.codemasters.com/topic/50942-f1-2020-udp-specification/
 #
 #
-
+import csv
+import os
 import socket, math, sys # Import libraries
 from struct import * # Import everything from struct
 import numpy as np #import numpy
@@ -43,7 +44,21 @@ float    f
 uint64    unsigned long long    Q
 
 '''
+def write_csv(package_ID,data):
+    Filename = os.path.join("session",str(package_ID),"data")
 
+    with open('{}.csv'.format(Filename),'a',newline='') as file:
+        writer = csv.writer(file, delimiter=",",quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(data)
+    pass
+
+#Initialize folder structure
+if not os.path.isdir("session"):
+    os.mkdir("session")
+    
+for num in range(10):
+    if not os.path.isdir(os.path.join("session",str(num))):
+        os.mkdir(os.path.join("session",str(num)))
 
 # Package receival loop
 while True:
