@@ -25,8 +25,6 @@ UDP_IP = "0.0.0.0" # UDP listen IP-address (0.0.0.0 = all)
 UDP_PORT = 20777 # UDP listen port
 PACKET_SIZE = 9999 # Amount of bytes in packet
 
-print(H.package_6)
-
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Create UDP Socket
 udp.bind((UDP_IP, UDP_PORT)) # Bind socket to IP and port
 print ("F1 Telemetry ready") # Init message
@@ -58,6 +56,7 @@ while True:
     #receive header to know the package id
     pkg_header = unpack(header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
 
+    '''
     if pkg_header[4] == 6:
          #print(sys.getsizeof(data))
          #print(unpack(package_6,data)[10:-4])
@@ -66,4 +65,8 @@ while True:
          for i in range(np.shape(re)[0]):
              print("\n" + "Car Nr. {}".format(i)  + "\n" + "Speed: {} km/h".format(re[i][0]) + "\n"  \
              "Tyres: FL: {} FR: {} RL: {} RR: {}".format(re[i][13],re[i][14],re[i][15],re[i][16]),end="\n")
-         
+    '''
+
+    if pkg_header[4] == 0 or  pkg_header[4] == 6 or pkg_header[4] == 7:
+        ar = np.array(unpack(package_6,data)[10:]) #remove first 10 entries, aka the header
+        print(ar)
