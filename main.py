@@ -68,6 +68,7 @@ while True:
     '''
 
     if pkg_header[4] == 0 or  pkg_header[4] == 6 or pkg_header[4] == 7:
-        print("packageID = {}".format(pkg_header[4]))
+        print("packageID = {}, size: {} should be: {}".format(pkg_header[4]),print(sys.getsizeof(data)), \
+        calcsize(H.packages[pkg_header[4]]))
         ar = np.array(unpack(H.packages[pkg_header[4]],data)[10:]) #remove first 10 entries, aka the header
         print(ar)
