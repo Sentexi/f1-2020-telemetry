@@ -61,6 +61,6 @@ if __name__ == "__main__":
     
     print("header: size: {}".format(calcsize(header)))
     
-    print("Package 1: size: {}".format(calcsize(package_0)))
+    print("Package 6: size: {}".format(calcsize(package_6)))
     
-    print("Package 1: size: {}".format(calcsize(package_1)))
+    print("Package 7: size: {}".format(calcsize(package_7)))
