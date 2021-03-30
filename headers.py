@@ -44,7 +44,7 @@ package_6 = header + package_6_codec*22 + "IBBb"
 Status data for all cars such as damage
 '''
 package_7_codec = "BBBBBfffHHBBHBBBBBBBBBBBBBBBBBbfBfff"
-package_7 = header + package_6_codec*22
+package_7 = header + package_7_codec*22
 
 
 dummy ="xyz"
