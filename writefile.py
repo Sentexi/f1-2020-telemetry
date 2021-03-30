@@ -1,3 +1,6 @@
+import csv
+import os
+
 def write_csv(package_ID,data):
     Filename = os.path.join("session",str(package_ID),"data")
 
