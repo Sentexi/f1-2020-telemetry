@@ -19,15 +19,29 @@ from struct import * # Import everything from struct
 import numpy as np #import numpy
 import headers as H #import predefined header structures
 import writefile as W #imports a simple csv file writer
+import argparse
 
-UDP_IP = "0.0.0.0" # UDP listen IP-address (0.0.0.0 = all)
-UDP_PORT = 20777 # UDP listen port
+parser = argparse.ArgumentParser(description='Records telemetry data from the Codemasters game F1 2020')
+
+parser.add_argument('-s', type=str, default="session", help='Session folder name, default=session',required=False)
+#parser.add_argument('-v', action='store_true', help='Verbose') #TODO: Add verbosity
+parser.add_argument('-p', type=int, default="20777", help='UDP Port to listen to')
+parser.add_argument('--ip', type=str, default="0.0.0.0", help='IP to listen for UDP Packets, defaults to all IPs')
+
+
+args = parser.parse_args()
+
+
+UDP_IP = args.ip #UDP listen IP-address (default: 0.0.0.0 = all)
+UDP_PORT = args.p #UDP listen port default: 20777
 PACKET_SIZE = 9999 # Amount of bytes in packet
+sessionname = args.s #Define session name, default: session
 
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # Create UDP Socket
 udp.bind((UDP_IP, UDP_PORT)) # Bind socket to IP and port
 print ("F1 Telemetry ready") # Init message
 print ("Listening on " + UDP_IP + ":" + str(UDP_PORT)) # Show IP and port
+print ("Session name: " + args.s)
 
 '''
 disambiguation of struct keys as used in F1 2020 telemetry
@@ -46,7 +60,6 @@ uint64    unsigned long long    Q
 
 '''
 
-sessionname = "Race1" #Define session name
 
 #Initialize folder structure
 if not os.path.isdir(sessionname):
