@@ -78,7 +78,16 @@ while True:
     pkg_header = unpack(H.header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
     pkg_header = unpack(H.header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
 
-    if pkg_header[4] != 3:
+    if pkg_header[4] == 4:
+        #print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
+        mylist = unpack(H.packages[pkg_header[4]],data)
+        dec = list(map(str, mylist))
+        print(dec)
+        ar = np.array(unpack(H.packages[pkg_header[4]],data)) #transforms data in numpy array
+        print(ar[0])
+        W.write_csv(pkg_header[4],ar ,sessionname) #writes each package in correspondent CSV
+
+    if pkg_header[4] != 3 and pkg_header[4] != 4:
         #print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
         ar = np.array(unpack(H.packages[pkg_header[4]],data)) #transforms data in numpy array
         W.write_csv(pkg_header[4],ar,sessionname) #writes each package in correspondent CSV
