@@ -79,13 +79,21 @@ while True:
     pkg_header = unpack(H.header,data[0:24]) #array of shape (1,10) Nr. 4 is PackageID
 
     if pkg_header[4] == 4:
-        #print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
-        mylist = unpack(H.packages[pkg_header[4]],data)
-        dec = list(map(str, mylist))
-        print(dec)
-        ar = np.array(unpack(H.packages[pkg_header[4]],data)) #transforms data in numpy array
-        print(ar[0])
-        W.write_csv(pkg_header[4],ar ,sessionname) #writes each package in correspondent CSV
+        #A mediocre solution for decoding the weird mess of UTF-8, int and float in a 
+        #somehow civilised manner
+        unpacked = unpack(H.packages[pkg_header[4]],data)
+        new = []
+        for i in range(len(unpacked)):
+            try:
+                new.append(unpacked[i].decode('utf-8').replace('\x00', ''))                 
+            except:
+                try:
+                    new.append((unpacked[i]+unpacked[i+1]).decode('utf-8'))
+                except:
+                    new.append(unpacked[i])                            
+        #ar = np.array(new) #transforms data in numpy array
+        #print(ar)
+        W.write_csv(pkg_header[4],new ,sessionname) #writes each package in correspondent CSV
 
     if pkg_header[4] != 3 and pkg_header[4] != 4:
         #print("packageID = {}, size: {} should be: {}".format(pkg_header[4],sys.getsizeof(data),calcsize(H.packages[pkg_header[4]])))
