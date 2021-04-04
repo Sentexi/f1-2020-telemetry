@@ -190,7 +190,7 @@ def extract_tyredata(sessionname):
     return header , main_part 
 
     
-def extract_learning_curve_data(sessionname):
+def extract_learning_curve_data(sessionname,num_driver):
     
     data = read_csv(sessionname,2) 
     
@@ -205,7 +205,7 @@ def extract_learning_curve_data(sessionname):
         main_part[i] = data[i][10:].reshape(22,-1)
     
     #finding the first valid lap, aka when last lap time is not zero anymore
-    x = np.array(np.where(main_part[:,0][:,0] == 0))[0]
+    x = np.array(np.where(main_part[:,num_driver][:,0] == 0))[0]
     y = np.argmax(x)
     
     start = x[y]+1 #adding one to remove last zero
@@ -213,7 +213,7 @@ def extract_learning_curve_data(sessionname):
     header = header[start:]
     main_part = main_part[start:]
            
-    return main_part[:,0][:,19]  , main_part[:,0][:,0]
+    return main_part[:,num_driver][:,19]  , main_part[:,num_driver][:,0]
     
 def extract_participants(sessionname):
     data = read_csv(sessionname,4)   
@@ -238,9 +238,9 @@ def extract_participants(sessionname):
         names.append(tmp.join(main_part[0][i][5:52].tolist()).replace('b','')) #A stupid workaround to remove the encoding error from ÄÖÜ
     return names
 
-def compare_drivers(session1,session2):
-    data1_laps,data1 = extract_learning_curve_data(session1)
-    data2_laps,data2 = extract_learning_curve_data(session2)
+def compare_drivers(session1,session2,num_driver1,num_driver2):
+    data1_laps,data1 = extract_learning_curve_data(session1,num_driver1)
+    data2_laps,data2 = extract_learning_curve_data(session2,num_driver2)
             
     plt.plot(data1_laps,data1,label=session1)
     plt.plot(data2_laps,data2,label=session2)
@@ -297,7 +297,59 @@ def create_tyre_wear_analysis(soft_session,medium_session,num_driver1,num_driver
     plt.legend()
     plt.show()
     pass
+    
+def create_race_results(sessionname,names):
+    def s_to_min(seconds):
+        minutes = int(seconds / 60)
+        seconds = round(((seconds / 60) - int(seconds / 60))*60,3)
+        laptime_string = "{}:{}".format(minutes,seconds)
+        return laptime_string
+        
+    def create_status(statuscode):
+        if statuscode == 0:
+            status = "INVALID"
+        if statuscode == 1:
+            status = "INACTIVE"
+        if statuscode == 2:
+            status = "ACTIVE"
+        if statuscode == 3:
+            status = "FIN"
+        if statuscode == 4:
+            status = "DSQ"
+        if statuscode == 5:
+            status = "NOT CLASSIFIED"
+        if statuscode == 6:
+            status = "DNF"
+        return status
+        
 
+    data = read_csv(sessionname,8)   
+        
+    header = np.empty((np.shape(data)[0],10))
+    main_part = np.empty((np.shape(data)[0],22,27))
+    num_cars = np.zeros((np.shape(data)[0],1))
+    
+    print("processing names")
+    for i in range(np.shape(data)[0]):
+    
+        header[i] = data[i][0:10]
+        
+        num_cars[i] = data[i][10:11]
+        
+        main_part[i] = data[i][11:].reshape(22,-1)    
+        
+    #for i in range(len(names)):
+    print(main_part[-1][:,0])
+    print(np.argsort(main_part[-1][:,0]))
+    for i in np.argsort(main_part[-1][:,0]).astype("int"):
+        if int(main_part[-1][i][0]) != 0:
+            print("{} \n Pos: {}. \t Grid: {} \t Best Lap: {} \t Penalties: {} \t Pit Stops: {} \t Status: {}".format(names[i], \
+            int(main_part[-1][i][0]),int(main_part[-1][i][2]), \
+            s_to_min(main_part[-1][i][6]),int(main_part[-1][i][8]),int(main_part[-1][i][4]), create_status(main_part[-1][i][5])))
+
+    pass
+    
+        
 if __name__ == "__main__":
 
     dirs = list_directories()     
@@ -307,6 +359,7 @@ if __name__ == "__main__":
     print("3. analyse tyre wear")
     print("4. Create tyre wear analysis")
     print("5. Compare two individual drivers")
+    print("6. race summary")
     
     program_val = int(input("Choose program"))
     
@@ -315,10 +368,18 @@ if __name__ == "__main__":
             
     
     if program_val == 1:    
+        show_menu(dirs)
+        num_dir1 = int(input("Choose directory for first session"))    
+    
+        names = extract_participants(dirs[num_dir1])
         show_menu(names)
         num_driver = int(input("Which driver do you want to analyze?"))
-        create_learning_curve(sessionname,names,num_driver)
+        create_learning_curve(dirs[num_dir1],names,num_driver)
     if program_val == 2:
+        show_menu(dirs)
+        num_dir1 = int(input("Choose directory for first session"))    
+      
+        names = extract_participants(dirs[num_dir1])      
         show_menu(names)
         num = int(input("How many drivers do you want to analyse"))
         num_driver = []
@@ -326,11 +387,15 @@ if __name__ == "__main__":
             val = input("Choose driver {}\n".format(i+1))
             num_driver.append(int(val))
             print(num_driver)
-        compare_many_drivers(sessionname,names,num_driver)
+        compare_many_drivers(dirs[num_dir1],names,num_driver)
     if program_val == 3:
+        show_menu(dirs)
+        num_dir1 = int(input("Choose directory for first session"))          
+
+        names = extract_participants(dirs[num_dir1])    
         show_menu(names)
         num_driver = int(input("Which driver do you want to analyze?"))
-        create_tyre_wear_curve(sessionname,num_driver,True)
+        create_tyre_wear_curve(dirs[num_dir1],num_driver,True)
     if program_val == 4:
         show_menu(dirs)
         num_dir1 = int(input("Choose directory for soft tyres"))
@@ -364,8 +429,15 @@ if __name__ == "__main__":
         show_menu(names)
         num_driver2 = int(input("Which driver do you want to analyze?"))        
         
-        compare_drivers(dirs[num_dir1],dirs[num_dir2])
+        compare_drivers(dirs[num_dir1],dirs[num_dir2],num_driver1,num_driver2)
         
+    if program_val == 6:
+        show_menu(dirs)
+        num_dir1 = int(input("Choose directory for race results"))        
+
+        names = extract_participants(dirs[num_dir1])
+        
+        create_race_results(dirs[num_dir1],names)
         
     
     #compare_drivers("Tele_Nahton","Tele_Sentexi")
