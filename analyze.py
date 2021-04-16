@@ -275,12 +275,14 @@ def create_tyre_wear_curve(sessionname,num_driver,graphics):
     
     return tyredata,lapdata
     
-def create_tyre_wear_analysis(soft_session,medium_session,num_driver1,num_driver2):
+def create_tyre_wear_analysis(soft_session,medium_session,hard_session,num_driver1,num_driver2,num_driver3):
     tyredata1,lapdata1 = create_tyre_wear_curve(soft_session,num_driver1,False)
     tyredata2,lapdata2 = create_tyre_wear_curve(medium_session,num_driver2,False)
+    tyredata3,lapdata3 = create_tyre_wear_curve(hard_session,num_driver3,False)
     
     plt.plot(tyredata1[:,num_driver1][:,13],lapdata1[:,num_driver1][:,0],label="Soft")
     plt.plot(tyredata2[:,num_driver2][:,13],lapdata2[:,num_driver2][:,0],label="Medium")
+    plt.plot(tyredata3[:,num_driver3][:,13],lapdata3[:,num_driver3][:,0],label="Hard")
     
     plt.xlabel("tyre wear in percent")
     plt.ylabel("lap time in s")
@@ -288,8 +290,19 @@ def create_tyre_wear_analysis(soft_session,medium_session,num_driver1,num_driver
     plt.legend()
     plt.show()    
     
+    plt.plot(lapdata1[:,num_driver1][:,19],lapdata1[:,num_driver1][:,0],label="Soft")
+    plt.plot(lapdata2[:,num_driver2][:,19],lapdata2[:,num_driver2][:,0],label="Medium")
+    plt.plot(lapdata3[:,num_driver3][:,19],lapdata3[:,num_driver3][:,0],label="Hard")
+    
+    plt.xlabel("lap Nr.")
+    plt.ylabel("lap time in s")
+    
+    plt.legend()
+    plt.show()
+    
     plt.plot(lapdata1[:,num_driver1][:,19],tyredata1[:,num_driver1][:,13],label="Soft")
     plt.plot(lapdata2[:,num_driver2][:,19],tyredata2[:,num_driver2][:,13],label="Medium")
+    plt.plot(lapdata3[:,num_driver3][:,19],tyredata3[:,num_driver3][:,13],label="Hard")
     
     plt.xlabel("lap Nr.")
     plt.ylabel("tyre wear in percent")
@@ -349,22 +362,31 @@ def create_race_results(sessionname,names):
 
     pass
     
+def analyse_assists(sessionname,names):
+   header , main_part = extract_tyredata(sessionname)
+   pos = int(np.shape(main_part)[0]/2)
+   for i in range(len(names)):
+        print("{} \n Traction Control: {} \t ABS: {} \t".format(names[i],main_part[pos][i][0],main_part[pos][i][1]))
+   
+   pass
         
 if __name__ == "__main__":
+
 
     dirs = list_directories()     
     
     print("1. analyse one driver")
     print("2. analyse many drivers")
-    print("3. analyse tyre wear")
+    print("3. Analyse tyre wear (one set only) ")
     print("4. Create tyre wear analysis")
     print("5. Compare two individual drivers")
     print("6. race summary")
+    print("7. Analyse assists")
     
     program_val = int(input("Choose program"))
     
     
-    names = extract_participants(sessionname)
+    #names = extract_participants(sessionname)
             
     
     if program_val == 1:    
@@ -411,7 +433,14 @@ if __name__ == "__main__":
         show_menu(names)
         num_driver2 = int(input("Which driver do you want to analyze?"))
         
-        create_tyre_wear_analysis(dirs[num_dir1],dirs[num_dir2],num_driver1,num_driver2)
+        show_menu(dirs)
+        num_dir3 = int(input("Choose directory for hard tyres"))
+        
+        names = extract_participants(dirs[num_dir3])
+        show_menu(names)
+        num_driver3 = int(input("Which driver do you want to analyze?"))
+        
+        create_tyre_wear_analysis(dirs[num_dir1],dirs[num_dir2],dirs[num_dir3],num_driver1,num_driver2,num_driver3)
         
         
     if program_val == 5:
@@ -438,6 +467,14 @@ if __name__ == "__main__":
         names = extract_participants(dirs[num_dir1])
         
         create_race_results(dirs[num_dir1],names)
+        
+    if program_val == 7:
+        show_menu(dirs)
+        num_dir1 = int(input("Choose directory for assist analysis"))        
+
+        names = extract_participants(dirs[num_dir1])
+        
+        analyse_assists(dirs[num_dir1],names)
         
     
     #compare_drivers("Tele_Nahton","Tele_Sentexi")
